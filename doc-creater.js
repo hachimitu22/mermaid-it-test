@@ -1,19 +1,21 @@
 const fs = require('fs');
 const path = require('path');
 const marked = require('markdown-it');
-// const markdownItMermaid = require('markdown-it-mermaid');
+const markdownItMermaid = require('markdown-it-mermaid').default;
 
 // markdown-itのインスタンスを作成し、mermaidプラグインを使用
-const md = marked()
-  // .use(markdownItMermaid)
-  ;
+const md = marked();
+md.use(markdownItMermaid);
 
 
 const inputDir = path.join(__dirname, 'doc_base');
 const outputDir = path.join(__dirname, 'doc');
+const ignores = [
+  path.join(__dirname, 'doc_base/sub/subsub/mermaid.md'),
+];
 
 
-async function processMarkdownFiles(inputDir, outputDir) {
+async function processMarkdownFiles(inputDir, outputDir, ignores) {
   console.log(inputDir);
   const items = fs.readdirSync(inputDir);
 
@@ -27,11 +29,10 @@ async function processMarkdownFiles(inputDir, outputDir) {
       if (!fs.existsSync(path)) {
         fs.mkdirSync(newOutputDir, { recursive: true });  // 出力ディレクトリがない場合は作成
       }
-      await processMarkdownFiles(fullPath, newOutputDir);
+      await processMarkdownFiles(fullPath, newOutputDir, ignores);
     }
     // .md ファイルの場合、HTML に変換して保存
-    else if (stat.isFile()) {
-
+    else if (stat.isFile() && ignores && !ignores.includes(fullPath)) {
       if (path.extname(item) === '.md') {
         const content = fs.readFileSync(fullPath, 'utf8');
         const htmlContent = md.render(content);
@@ -55,7 +56,7 @@ async function processMarkdownFiles(inputDir, outputDir) {
       if (!fs.existsSync(path)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
-      await processMarkdownFiles(inputDir, outputDir);
+      await processMarkdownFiles(inputDir, outputDir, ignores);
       console.log('Markdown files have been converted successfully!');
   } catch (err) {
       console.error('Error processing files:', err);

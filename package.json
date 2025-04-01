@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "mmdc": ".\\node_modules\\.bin\\mmdc"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mermaid-js/mermaid-cli": "^11.4.2",
     "markdown-it": "^14.1.0",
     "markdown-it-mermaid": "^0.2.5"
   }
